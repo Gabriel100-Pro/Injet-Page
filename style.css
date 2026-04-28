@@ -790,6 +790,12 @@ body.cursor-hover #cursor-ring {
     word-break: break-word;
   }
 
+  .cta .btn {
+    max-width: calc(100% - 70px);
+    margin-right: auto;
+    margin-left: auto;
+  }
+
   .hero-cta {
     width: 100%;
   }
