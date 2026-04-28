@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calcular Orçamento | Injet Nobre</title>
+  <meta name="description" content="Calcule o valor do seu pedido de estojos, suportes e expositores Injet Nobre.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f5f7;
+      --bg-dark: #090a0c;
+      --accent: #2b6cff;
+      --accent-hover: #1a57e0;
+      --text: #1a1d26;
+      --text-muted: #6b7280;
+      --line: rgba(0,0,0,0.09);
+      --card-bg: #ffffff;
+      --radius: 20px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Topbar ── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(245, 245, 247, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .nav {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      color: var(--text);
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+    }
+
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      flex-shrink: 0;
+    }
+
+    .back-link {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .back-link:hover { text-decoration: underline; }
+
+    /* ── Main layout ── */
+    main {
+      flex: 1;
+      max-width: 700px;
+      margin: 2.5rem auto;
+      padding: 0 1.25rem 3rem;
+      width: 100%;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .eyebrow {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .page-header h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      line-height: 1.2;
+      color: var(--text);
+    }
+
+    .page-header p {
+      margin-top: 0.5rem;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+      overflow: hidden;
+    }
+
+    /* ── Product rows ── */
+    .product-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 1rem;
+      padding: 1.1rem 1.4rem;
+      border-bottom: 1px solid var(--line);
+      transition: background 180ms ease;
+    }
+
+    .product-row:hover { background: #fafafa; }
+    .product-row:last-of-type { border-bottom: none; }
+
+    .product-info { display: flex; flex-direction: column; gap: 0.15rem; }
+
+    .product-name {
+      font-weight: 700;
+      font-size: 0.97rem;
+      color: var(--text);
+    }
+
+    .product-price {
+      font-size: 0.83rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* ── Quantity stepper ── */
+    .stepper {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .stepper button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 36px;
+      height: 38px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      transition: background 150ms ease;
+      flex-shrink: 0;
+    }
+
+    .stepper button:hover { background: rgba(43,108,255,0.09); }
+    .stepper button:active { background: rgba(43,108,255,0.18); }
+
+    .stepper input[type="number"] {
+      width: 52px;
+      height: 38px;
+      border: none;
+      background: transparent;
+      text-align: center;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      -moz-appearance: textfield;
+      outline: none;
+    }
+
+    .stepper input[type="number"]::-webkit-inner-spin-button,
+    .stepper input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+    /* ── Total block ── */
+    .total-block {
+      background: #f0f5ff;
+      border-top: 1.5px solid #dce8ff;
+      padding: 1.3rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .total-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .total-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .total-value span {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-right: 0.15rem;
+    }
+
+    /* ── Breakdown ── */
+    .breakdown {
+      padding: 0.9rem 1.4rem;
+      border-top: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.83rem;
+      color: var(--text-muted);
+    }
+
+    .breakdown-row.hidden { display: none; }
+
+    .breakdown-row strong { color: var(--text); }
+
+    /* ── Actions ── */
+    .actions {
+      padding: 1.2rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      text-decoration: none;
+      padding: 0.8rem 1.2rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      display: block;
+      width: 100%;
+      transition: transform 150ms ease, box-shadow 200ms ease, opacity 150ms ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(120deg, #0f1728, #25385f 56%, #3563b8);
+      box-shadow: 0 10px 22px rgba(35,56,95,0.28);
+    }
+
+    .btn-primary:disabled,
+    .btn-primary[aria-disabled="true"] {
+      opacity: 0.45;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-ghost {
+      color: var(--accent);
+      background: transparent;
+      border: 1.5px solid rgba(43,108,255,0.3);
+    }
+
+    .btn-ghost:hover { background: rgba(43,108,255,0.06); }
+
+    /* ── Empty state ── */
+    .empty-hint {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 0 1.4rem 0.8rem;
+    }
+
+    .empty-hint.hidden { display: none; }
+
+    /* ── Note ── */
+    .note {
+      margin-top: 1.2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ── Ripple ── */
+    .ripple {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.3);
+      pointer-events: none;
+      transform: scale(0);
+      animation: rippleAnim 500ms ease-out forwards;
+    }
+
+    @keyframes rippleAnim { to { transform: scale(4); opacity: 0; } }
+
+    /* ── Mobile ── */
+    @media (max-width: 480px) {
+      .product-row {
+        grid-template-columns: 1fr;
+        gap: 0.6rem;
+      }
+
+      .stepper { width: fit-content; }
+
+      .total-block { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="nav">
+      <a class="logo" href="index.html" aria-label="Injet Nobre">
+        <span class="logo-mark">IN</span>
+        <span class="logo-text">Injet Nobre</span>
+      </a>
+      <a class="back-link" href="index.html">
+        ← Voltar ao site
+      </a>
+    </div>
+  </header>
+
+  <main>
+    <div class="page-header">
+      <p class="eyebrow">Simulador de preços</p>
+      <h1>Calcule o seu orçamento</h1>
+      <p>Informe a quantidade de cada produto e veja o valor total na hora.</p>
+    </div>
+
+    <div class="card">
+
+      <!-- Estojo para Relógio -->
+      <div class="product-row">
+        <div class="product-info">
+          <span class="product-name">Estojo para Relógio</span>
+          <span class="product-price">R$ 2,50 / unidade</span>
+        </div>
+        <div class="stepper">
+          <button type="button" aria-label="Diminuir" data-action="dec" data-target="qty-estojo">−</button>
+          <input id="qty-estojo" type="number" min="0" value="0" aria-label="Quantidade de estojos">
+          <button type="button" aria-label="Aumentar" data-action="inc" data-target="qty-estojo">+</button>
+        </div>
+      </div>
+
+      <!-- Expositor para Brinco -->
+      <div class="product-row">
+        <div class="product-info">
+          <span class="product-name">Expositor para Brinco</span>
+          <span class="product-price">R$ 1,00 / unidade</span>
+        </div>
+        <div class="stepper">
+          <button type="button" aria-label="Diminuir" data-action="dec" data-target="qty-expositor">−</button>
+          <input id="qty-expositor" type="number" min="0" value="0" aria-label="Quantidade de expositores">
+          <button type="button" aria-label="Aumentar" data-action="inc" data-target="qty-expositor">+</button>
+        </div>
+      </div>
+
+      <!-- Suporte para Brinco -->
+      <div class="product-row">
+        <div class="product-info">
+          <span class="product-name">Suporte para Brinco</span>
+          <span class="product-price">R$ 1,00 / unidade</span>
+        </div>
+        <div class="stepper">
+          <button type="button" aria-label="Diminuir" data-action="dec" data-target="qty-suporte">−</button>
+          <input id="qty-suporte" type="number" min="0" value="0" aria-label="Quantidade de suportes">
+          <button type="button" aria-label="Aumentar" data-action="inc" data-target="qty-suporte">+</button>
+        </div>
+      </div>
+
+      <!-- Breakdown -->
+      <div class="breakdown" id="breakdown">
+        <div class="breakdown-row hidden" id="br-estojo">
+          <span id="br-estojo-label"></span>
+          <strong id="br-estojo-val"></strong>
+        </div>
+        <div class="breakdown-row hidden" id="br-expositor">
+          <span id="br-expositor-label"></span>
+          <strong id="br-expositor-val"></strong>
+        </div>
+        <div class="breakdown-row hidden" id="br-suporte">
+          <span id="br-suporte-label"></span>
+          <strong id="br-suporte-val"></strong>
+        </div>
+      </div>
+
+      <!-- Total -->
+      <div class="total-block">
+        <span class="total-label">Total estimado</span>
+        <div class="total-value"><span>R$</span><span id="total-display">0,00</span></div>
+      </div>
+
+      <!-- Empty hint -->
+      <p class="empty-hint" id="empty-hint">Adicione pelo menos um produto para continuar.</p>
+
+      <!-- Actions -->
+      <div class="actions">
+        <a id="wa-btn" class="btn btn-primary" href="#" aria-disabled="true" target="_blank" rel="noopener noreferrer">
+          Enviar orçamento pelo WhatsApp
+        </a>
+        <button type="button" class="btn btn-ghost" id="reset-btn">Limpar tudo</button>
+      </div>
+
+    </div>
+
+    <p class="note">
+      Os preços são por unidade e podem variar conforme personalização e volume.<br>
+      Um atendente confirmará o valor final pelo WhatsApp.
+    </p>
+  </main>
+
+  <script>
+    const PRODUCTS = [
+      { inputId: 'qty-estojo',    price: 2.50, label: 'Estojo para Relógio',   brId: 'br-estojo'    },
+      { inputId: 'qty-expositor', price: 1.00, label: 'Expositor para Brinco', brId: 'br-expositor' },
+      { inputId: 'qty-suporte',   price: 1.00, label: 'Suporte para Brinco',   brId: 'br-suporte'   },
+    ];
+
+    const WA_NUMBER = '5511951146301';
+
+    function fmt(val) {
+      return val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function getQty(inputId) {
+      const val = parseInt(document.getElementById(inputId).value, 10);
+      return isNaN(val) || val < 0 ? 0 : val;
+    }
+
+    function update() {
+      let total = 0;
+      let totalItems = 0;
+      const lines = [];
+
+      PRODUCTS.forEach(({ inputId, price, label, brId }) => {
+        const qty = getQty(inputId);
+        const subtotal = qty * price;
+        const brRow = document.getElementById(brId);
+
+        if (qty > 0) {
+          total += subtotal;
+          totalItems += qty;
+          document.getElementById(brId + '-label').textContent =
+            `${label} × ${qty}`;
+          document.getElementById(brId + '-val').textContent =
+            'R$ ' + fmt(subtotal);
+          brRow.classList.remove('hidden');
+          lines.push(`${qty}x ${label} (R$ ${fmt(subtotal)})`);
+        } else {
+          brRow.classList.add('hidden');
+        }
+      });
+
+      document.getElementById('total-display').textContent = fmt(total);
+
+      const hint = document.getElementById('empty-hint');
+      const waBtn = document.getElementById('wa-btn');
+
+      if (totalItems === 0) {
+        hint.classList.remove('hidden');
+        waBtn.setAttribute('aria-disabled', 'true');
+        waBtn.setAttribute('href', '#');
+      } else {
+        hint.classList.add('hidden');
+        waBtn.removeAttribute('aria-disabled');
+
+        const msg = encodeURIComponent(
+          `Olá! Gostaria de solicitar um orçamento:\n\n` +
+          lines.join('\n') +
+          `\n\nTotal estimado: R$ ${fmt(total)}`
+        );
+        waBtn.setAttribute('href', `https://api.whatsapp.com/send?phone=${WA_NUMBER}&text=${msg}`);
+      }
+    }
+
+    // Stepper buttons
+    document.querySelectorAll('.stepper button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = document.getElementById(btn.dataset.target);
+        const current = parseInt(input.value, 10) || 0;
+        if (btn.dataset.action === 'inc') {
+          input.value = current + 1;
+        } else {
+          input.value = Math.max(0, current - 1);
+        }
+        update();
+      });
+    });
+
+    // Direct input change
+    PRODUCTS.forEach(({ inputId }) => {
+      document.getElementById(inputId).addEventListener('input', update);
+    });
+
+    // Reset
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      PRODUCTS.forEach(({ inputId }) => { document.getElementById(inputId).value = 0; });
+      update();
+    });
+
+    // Ripple on btn-primary
+    document.getElementById('wa-btn').addEventListener('click', function (e) {
+      if (this.getAttribute('aria-disabled') === 'true') { e.preventDefault(); return; }
+      const r = document.createElement('span');
+      r.className = 'ripple';
+      const rect = this.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size / 2}px;top:${e.clientY - rect.top - size / 2}px`;
+      this.appendChild(r);
+      r.addEventListener('animationend', () => r.remove());
+    });
+
+    update();
+  </script>
+</body>
+</html>
